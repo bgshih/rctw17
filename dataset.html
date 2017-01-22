@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="css/style.css" />
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  	<title>ICDAR2017-Dataset</title>
+</head>
+
+<body>
+	<div style="color: black; margin-top:-10px;width:100%">
+		<p class="titleSegoeLight" style="width:760px">1. Overview</p>
+		<p class="bodyNormal" style="color:black;" align="justify">
+		This competition is based on a dataset of more than 12,000 images. Most of the images are collected in the wild by phone cameras, and others are screenshots. The images exhibit various kinds of scenes, such as street views, posters, menus, indoor scenes, and screenshots on mobile apps. Besides, about half of the text instances in the dataset are multi-oriented.
+		</p>
+
+		<p class="titleSegoeLight" style="width:100%">2. Annotation Format</p>
+		<p class="bodyNormal" style="color:black;" align="justify">
+		Every image in the dataset is annotated with text line locations and the transcript of each text line instance. Locations are annotated in terms of polygons with four vertices, transcripts are UTF-8 encoded strings. The Annotation for one image is stored as a dictionary-like object (see Figure1.):  </p>
+		<div class="dataset">
+			<div class = "data" id = 'data1'>
+				<div class="blob">
+					<img class="imgdata" src = 'image/1.png' />
+					<p class='name'>img_1.jpg</p>
+				</div>
+				<div class="blob">
+					<img class="imgdata" src = 'image/annotation_1.png' />
+				</div>
+				<div class="blob">
+					<div class="box" >
+						<li > 'box':</li>
+						<li>&emsp;'difficult':[1,0,1,0]</li>
+						<li>&emsp;'local':</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[451,2940,568,2940,568,2996,451,2996]</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[1630,2594,1820,2594,1820,2752,1630,2752]</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[1854,2620,2201,2620,2201,2737,1854,2737]</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[1559,2772,2388,2772,2388,2965,1559,2965]</li>
+						<li>&emsp;'label': '###', '\xe7\xbb\xbf\xe7\x98\xa6'</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'LVSHOU', 'gulugulu'</li>
+						<li> 'img':'img_1.jpg'</li>
+					</div>
+<!-- 					<p class="name">img_1.txt</p> -->
+				</div>
+			</div>
+
+			<div class = "data" id = 'data2'>
+				<div class="blob">
+					<img class="imgdata" src = 'image/2.png' />
+					<p class='name'>img_2.jpg</p>
+				</div>
+				<div class="blob">
+					<img class="imgdata" src = 'image/annotation_2.png' />
+				</div>
+				<div class="blob">
+					<div class="box" >
+						<li > 'box':</li>
+						<li>&emsp;'difficult':[0,0]</li>
+						<li>&emsp;'local':</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[921,1669,2331,1669,2331,2021,921,2021]</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[922,2046,2372,2046,2372,2359,922,2359]</li>
+						<li>&emsp;'label':</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'HERGER'</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'\xe9\xba\xa6\xe6\xa0\xbc\xe5\xb0\x94\xe7'</li>
+						<li > 'img':'img_2.jpg'</li>
+					</div>
+<!-- 					<p class="name">img_2.txt</p> -->
+				</div>
+			</div>
+
+		<div class = "data" id = 'data3'>
+			<div class="blob">
+				<img class="imgdata" src = 'image/3.png' />
+				<p class='name'>img_3.jpg</p>
+			</div>
+			<div class="blob">
+				<img class="imgdata" src = 'image/annotation_3.png' />
+				<p class='name'></p>
+			</div>
+			<div class="blob">
+				<div class="box" >
+						<li > 'box':</li>
+						<li>&emsp;'difficult':[0]</li>
+						<li>&emsp;'local':</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;[340,1651,2297,1651,2297,2180,340,2180]</li>
+						<li>&emsp;'label':</li>
+						<li>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;'\xe7\xab\xa5\xe4\xb9\x90\xe5\x9b\xad'</li>
+						<li >'img':'img_3.jpg'</li>
+
+				</div>
+<!-- 				<p class="name">img_3.txt</p> -->
+			</div>
+		</div>
+
+		<p class='notes'>
+			<span class="note" style="width: 32%;">(a)</span>
+			<span class="note" style="width: 24%;">(b)</span>
+			<span class="note" style="width: 43%;">(c)</span>
+		</p>
+		<p class="notes"><strong>Figure1.</strong> (a) Original Images. (b) Visualization of the ground truth. In green “clear” words, in red “fuzzy” words. (c) Ground Truth brief content.</p>
+		<p class="bodyNormal"  align="justify">Ground truth for "trainval" set will be serialized into a single pickle file. The format of the ground truth file of one image will follow the dictionary-like structure as below:</p>
+
+		<div class="box" style="height:200px;width:80%;font-size:12px">
+			<li>{</li>
+			<li>&emsp;‘box’:</li>
+			<li>&emsp;&emsp;{</li>
+			<li>&emsp;&emsp;&emsp;‘difficult’:[0,1],</li>
+			<li>&emsp;&emsp;&emsp;’local’:[[x1_1,y1_1,x2_1,y2_1,x3_1,y3_1,x4_1,y4_1],[x1_1,y1_1,x2_1,y2_1,x3_1,y3_1,x4_1,y4_1]],</li>
+			<li>&emsp;&emsp;&emsp;’label’:[transcript_1,transcript_2]</li>
+			<li>&emsp;&emsp;},</li>
+			<li>&emsp;’img’: ’img_name.jpg’</li>
+			<li>}</li>
+			<!-- <li >...</li> -->
+		</div>
+		<p class="bodyNormal"  align="justify">Each instance annotation contains a series of fields, including the bounding box info as well as the transcription info.</p>
+		<ul>
+		<li>"box" record the info of the word bounding boxes in the image, such as clarity, localization and transcript .</li>
+			<ul>
+			<li>"difficult" represents the clarity of the text which can be clear or fuzzy.For convenience, the clear and fuzzy text is marked as 0 and 1 respectively.</li>
+			<li>"local" represents the coordinate of word bounding boxes in the image.Locations are annotated in terms of polygons with four vertices clockwisely.</li>
+			<li>"label" represents the textual transcription of the word. Transcripts are UTF-8 encoded strings.</li>
+			</ul>
+		<li>"img" record the corresponding image name. </li>
+		</ul>
+
+		<p class="titleSegoeLight" style="width:100%">3.Downloads</p>
+		<p class="bodyNormal" style="padding-bottom:100px;" align="justify">A "trainval" set of 11514 images along with the annotations are available through the <a href="http://www.baidu.com" target="_blank">download link</a>. While a "test" set of 1000 images will also be made available a few weeks before the submission deadline. Note that the "trainval" data are common for all tasks. </p>
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+body{
+	font-family: 'Segoe UI Light',segoe_uilight,Arial,Helvetica,sans-serif;
+	color:#888;
+
+    font-weight: 300;
+    width:80%;
+	margin: 10px auto;
+    /**margin-left:15%;*/
+
+}
+
+.titleSegoeLight {
+    font-family: 'Segoe UI Light',segoe_uilight,Arial,Helvetica,sans-serif;
+    color: #1d2125;
+    font-size: 28px;
+    font-weight: 300;
+}
+
+.bodyNormal{
+    font-family: Verdana,Arial,Helvetica,sans-serif;
+    color: black;
+    font-size: 14px;
+    line-height: 20px;
+}
+.imgdata{
+	zoom:67%;
+}
+
+.box{
+	width:350px;
+	list-style-type: none;
+	/*font-family: Arial,Helvetica,sans-serif;*/
+	font-family: Consolas, "Liberation Mono", Courier, monospace;
+	color:black;
+	font-weight: 300;
+	font-size:11px;
+	border:1px solid #a1a1a1;
+	vertical-align:top;
+	line-height: 20px;
+	height:200px;
+	background-color: #d6ffd6;
+	border-radius: 3px;
+	padding: 0 10px;
+	padding-top: 10px;
+}
+
+
+.blob{
+	display:inline-block;
+	margin:10px;
+	margin-bottom: 0px;
+	vertical-align:top;
+
+}
+
+.name{
+	font-style: italic;
+	font-size: 14px;
+}
+
+.note{
+	display: inline-block;
+    display: -moz-inline-box;
+    *display: inline; /* For IE7 */
+    zoom: 1; /* Trigger hasLayout */
+    text-align: center;
+}
+
+.notes{
+	font-family: Arial,Helvetica,sans-serif;
+	color:black;
+	font-size:14px;
+    font-weight: 300;
+    text-align: center;
+}
+
+.data {
+	width: 100%;
+}
+
+.data div {
+	display: inline-block;
+}
