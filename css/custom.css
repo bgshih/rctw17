@@ -1,0 +1,27 @@
+p {
+  font-size: 16px;
+}
+
+ul {
+  font-size: 15px;
+}
+
+#example-images {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.container {
+  max-width: 900px;
+}
+
+.jumbotron {
+  background: url("../image/LantingXuProc.jpg");
+  margin-top: 50px;
+  margin-bottom: 20px;
+  /*min-height: 300px;*/
+}
+
+#footer p {
+  /*font-size: 10px;*/
+}

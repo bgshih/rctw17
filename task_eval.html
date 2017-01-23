@@ -1,64 +1,63 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="css/style.css" />
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  	<title>ICDAR2017-Task & Evaluation</title>
-</head>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<body>
-	<div style="color: black; margin-top:-10px:width:100%">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/common.js"></script>
 
-		<p class="titleSegoeLight" style="width:760px">Tasks</p>
-		<p class="bodyNormal" style="color:black;" align="justify">The challenge is set up around two tasks:</p>
-		<p class="bodyNormal" style="color:black;" align="justify">&emsp;&emsp;&emsp;I. Text Localization, where the objective is to accurately localize text in terms of polygons with 4 vertices.</p>
-		<p class="bodyNormal" style="color:black;" align="justify">&emsp;&emsp;&emsp;II. End-to-End Recognition, where the objective is to localize and recognize all words in the image in a single step.</p>
-		<p class="bodyNormal" style="color:black;padding-bottom:30px;" align="justify">A "trainval" set of 11514 images is provided through the <a href='./dataset.html'>dataset</a> section. All tasks share the same "trainval" data and ground truth file. Note that a set of test images will be made available a few weeks before the <a href='./submission.html'>submission</a> deadline.</p>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+  </head>
 
-		<p class="titleSegoeLight" style="width:100%">Task 1 - Text Localization</p>
-		<p class="bodyNormal" style="color:black;" align="justify">For the text localization task, we provide bounding boxes of words as well as corresponding transcripts for the images in the dataset. Please refer to the <a href="./dataset.html">dataset</a> section for detailed info.</p>
+  <body>
+    <!-- Navigation bar and jumbotron -->
+    <div id="nav-jumbo-placeholder"> </div>
 
-		<p class="titleSegoeLight" style="width:100%">Submission Stage</p>
-		<p class="bodyNormal" style="color:black;" align="justify">For the test phase, we will make available a set of test images a few weeks before the submission deadline. The participants will be required to automatically localize the text in the image and return bounding boxes along with their scores.</p>
-		<p class="bodyNormal"  align="justify">
-		For each image in the test set , a separated UTF-8 text file should be provided, following the naming convention:
-		</p>
-		<p class="bodyNormal" style="margin-left:20px;" align="justify">&emsp;[image name].txt</p>		
-		<p class="bodyNormal" style="color:black;" align="justify">The result will have to be separated text file for each image, with each line corresponding to a bounding box (comma separated values) and its score in the following format:</p>
-		<div class="box" style="height:70px;width:40%;">
-			<li>x1_1,y1_1,x2_1,y2_1,x3_1,y3_1,x4_1,y4_1,score_1</li>
-			<li>x1_2,y1_2,x2_2,y2_2,x3_2,y3_2,x4_2,y4_2,score_2</li>
-			<li >...</li>
-		</div>
-		<p class="bodyNormal" style="color:black;" align="justify">A single compressed (zip or rar) file should be submitted containing all the result files. You can switch to the <a href='./submission.html'>submission</a> section for detailed submission procedure.</p>
+    <div class="container">
+      <!-- <p>The challenge consists of two tasks:</p>
+      <ul>
+        <li>Text localization: Localize text in images.</li>
+        <li>End-to-End Recognition: Localize and recognize text in images.</li>
+      </ul> -->
 
-		<p class="titleSegoeLight" style="width:100%">Evaluation</p>
-		<p class="bodyNormal" style="color:black;" align="justify">The evaluation protocol follows PASCAL VOC [1], which adopts mean Average Precision (mAP) as the primary metric. The original mAP is defined on axis-aligned boxes, while text in our dataset may be multi-oriented. Therefore, we will calculate intersection-over-union (IoU) over polygons rather than axis-aligned rectangles.</p>
-		<p class="bodyNormal" style="color:black;padding-bottom:30px;" align="justify">In our evaluation protocol, a detected polygon is marked as true positive if 1) IoU with a ground truth polygon is over 0.5 and 2) the ground truth polygon has not been matched to another detection yet. The rest of our protocol follows the PASCAL VOC protocol. We will calculate both Average Precision and Average Recall, and take AP as the primary metric. Note that this metric is the same as mAP, since we only have one category.</p>
+      <h2>Task I - Text Localization</h2>
+      <p>The aim of Task I is to localize text lines in test images. Participants can train their detectors on the provided <a href="dataset.html">training set</a>. Extra data is allowed, but must be reported during submission. Fine-tuning models that are pretrained on <a href="http://image-net.org/">ImageNet</a> is also allowed.</p>
 
-		<p class="titleSegoeLight" style="width:100%">Task 2 - End-to-End Recognition</p>
-		<p class="bodyNormal" style="color:black;" align="justify">For the End-to-End Recognition task, the ground truth is the same as for Task 1. Participants can refer to <a href='./dataset.html'>dataset</a> section for detailed info.</p>
+      <h3>Submission</h3>
+      <p>For each image in the test set, a UTF-8 text file should be provided in the following naming convention:</p>
+      <pre><code>task1_&lt;image_name&gt;.txt</code></pre>
+      <p>Each line of the text file is a detected text line, made up by the coordinates of a quadrilateral and a confidence score. Vertices are in the clockwise order.</p>
+      <pre><code>&lt;x1&gt;,&lt;y1&gt;,&lt;x2&gt;,&lt;y2&gt;,&lt;x3&gt;,&lt;y3&gt;,&lt;x4&gt;,&lt;y4&gt;,&lt;score&gt;
+&lt;x1&gt;,&lt;y1&gt;,&lt;x2&gt;,&lt;y2&gt;,&lt;x3&gt;,&lt;y3&gt;,&lt;x4&gt;,&lt;y4&gt;,&lt;score&gt;
+...</code></pre>
+      <p>Participants need to submit a single zip file that contains all the result files.</p>
 
-		<p class="titleSegoeLight" style="width:100%">Submission Stage</p>
-		<p class="bodyNormal" style="color:black;" align="justify">Similar to Task 1, the participants will be required to automatically localize the text in the image and return bounding boxes along with their recognized texts.</p>
-		<p class="bodyNormal"  align="justify">
-		For each image in the test set , a separated UTF-8 text file should be provided,following the naming convention:
-		</p>
-		<p class="bodyNormal" style="margin-left:20px;" align="justify">&emsp;[image name].txt</p>
-		<p class="bodyNormal" style="color:black;" align="justify">The result will have to be separated text file for each image, with each line corresponding to a bounding box (comma separated values) and its recognized text in the following format:</p>
-		<div class="box" style="height:70px;width:40%;">
-			<li>x1_1,y1_1,x2_1,y2_1,x3_1,y3_1,x4_1,y4_1,recognized_text_1</li>
-			<li>x1_2,y1_2,x2_2,y2_2,x3_2,y3_2,x4_2,y4_2,recognized_text_2</li>
-			<li >...</li>
-		</div>
-		<p class="bodyNormal" style="color:black;" align="justify">A single compressed file (zip or rar) containing the results of all test images should be submitted. You can switch to the <a href='./submission.html'>submission</a> section for detailed submission procedure.
+      <h3>Evaluation Protocol</h3>
+      <p>The evaluation protocol follows <a href="http://host.robots.ox.ac.uk/pascal/VOC/">PASCAL VOC</a>, which adopts mean Average Precision (mAP) as the primary metric. The original mAP is defined on axis-aligned boxes, while text in our dataset may be multi-oriented. Therefore, we will calculate intersection-over-union (IoU) over polygons rather than axis-aligned rectangles.</p>
+      <p>In our evaluation protocol, a detected polygon is marked as true positive if 1) IoU with a ground truth polygon is over 0.5 and 2) the ground truth polygon has not been matched to another detection yet. The rest of our protocol follows the PASCAL VOC protocol. We will calculate both Average Precision and Average Recall, and take AP as the primary metric. Note that this metric is the same as mAP, since we only have one category.</p>
 
-		<p class="titleSegoeLight" style="width:100%">Evaluation</p>
-		<p class="bodyNormal" style="color:black;" align="justify">In detection phase, each detection is matched to a ground truth polygon that has the maximum IoU, or "null" if none has IoU over 0.5. If multiple detections are matched with the same ground truth, only the one with the maximum IoU will be kept and the rest are matched to "null".</p>
-		<p class="bodyNormal" style="color:black;" align="justify">In recognition phase , we calculate the edit distances between all matching pairs. If a detection is matched to ‘null’, then an empty string will be taken as the ground truth text. The edit distances are summarized and divided by the number of test images. The resulting average edit distance will be taken as the metric.</p>
+      <h2>Task II - End-to-End Recognition</h2>
+      <p>The aim of Taks II is to localize and recognize text lines in test images. Participants can train their detectors on the provided <a href="dataset.html">training set</a>. Extra data is allowed, but must be reported during submission. Fine-tuning models that are pretrained on <a href="http://image-net.org/">ImageNet</a> is also allowed.</p>
 
-		<p class="titleSegoeLight" style="width:100%">Reference</p>
-		<p class="bodyNormal" style="color:black;padding-bottom:80px;" align="justify">[1] Everingham, M. and Eslami, S.M.A. and Van Gool, L. and Williams, C.K.I. and Winn, J. and Zisserman, A.:The Pascal Visual Object Classes Challenge: A Retrospective. IJCV, 2015</p>
+      <h3>Submission</h3>
+      <p>For each image in the test set, a UTF-8 text file should be provided in the following naming convention:</p>
+      <pre><code>task2_&lt;image_name&gt;.txt</code></pre>
+      <p>Each line of the text file contains the position and recognized text of a text line. File format:</p>
+      <pre><code>&lt;x1&gt;,&lt;y1&gt;,&lt;x2&gt;,&lt;y2&gt;,&lt;x3&gt;,&lt;y3&gt;,&lt;x4&gt;,&lt;y4&gt;,&lt;recognized_text&gt;
+&lt;x1&gt;,&lt;y1&gt;,&lt;x2&gt;,&lt;y2&gt;,&lt;x3&gt;,&lt;y3&gt;,&lt;x4&gt;,&lt;y4&gt;,&lt;recognized_text&gt;
+...</code></pre>
+      <p>Participants need to submit a single zip file that contains all the result files.</p>
+
+      <h3>Evaluation Protocol</h3>
+      <p>First, every detected quadrilateral is matched to a groundtruth quadrilateral that has the maximum IoU, or <code>null</code> if none has IoU over 0.5. If multiple detections are matched with the same ground truth, only the one with the maximum IoU will be kept and the rest are matched to <code>null</code>.</p>
+      <p>Then, the edit distances between all matching pairs are calculated. If a detection is matched to <code>null</code>, then an empty string will be taken as the groundtruth text. The edit distances are summarized and divided by the number of the test images. The resulting average edit distance is taken as the primary metric.</p>
 
 
-
-
+      <!-- Footer placeholder -->
+      <div id="footer"> </div>
+    </div>
+  </body>
+</html>

@@ -1,105 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-  <title>RCTW-17</title>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Bootstrap -->
-  <link type="text/css" href="css/bootstrap.css" rel="stylesheet" />
-  <!-- <link type="text/css" href="css/main.css" rel="stylesheet" /> -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/common.js"></script>
 
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-  <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-  <![endif]-->
-</head>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+  </head>
 
+  <body>
+    <div id="nav-jumbo-placeholder"> </div>
 
-<body>
-  <div class="container-fluid">
-    <!-- Navigation bar -->
-    <div class="container">
-      <ul class="nav">
-        <li class="nav-item">
-          <a href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a href="#">Dataset</a>
-        </li>
-      </ul>
-    </div>
-
-    <!-- <nav class="navbar navbar-inverse">
-      <div class="container">
-        <ul class="nav navbar-nav">
-          <li class="active"><a href="#">Home</a></li>
-          <li><a href="dataset.html">Dataset</a></li>
-          <li><a href="task_evalualution.html">Tasks & Evaluation</a></li>
-          <li><a href="about_us.html">About Us</a></li>
-        </ul>
-      </div>
-    </nav> -->
-
-    <div class="jumbotron jumbotron-fluid">
-      <div class="container">
-        <h1 class="display-2">RCTW-17</h1>
-        <p class="lead">ICDAR2017 Competition on Reading Chinese Text in the Wild</p>
-        <a class="btn btn-primary" href="#" role="button">Register Now</a>
-      </div>
-    </div>
-
-    <!-- About -->
     <div class="container" id="intro">
+      <h2>Introduction</h2>
       <p>
       RCTW-17 is a competition on reading Chinese Text in images.
-      For training and testing, we provide a large-scale dataset that consists of various kinds of images, including street views, posters, menus, indoor scenes, and screenshots. See <a href="dataset.html">Dataset</a> and <a href="task_evaluation.html">Task & Evaluation</a> for details.
+      For training and testing, we provide a large-scale dataset that consists of various kinds of images, including street views, posters, menus, indoor scenes, and screenshots. See <a href="dataset.html">Dataset</a> and <a href="task_eval.html">Tasks</a> for details.
       </p>
-    </div>
 
-    <!-- News -->
-    <!-- <div class="container-fluid">
-      <h2>News</h2>
-    </div> -->
-
-    <!-- Timetable -->
-    <div class="container" id="time-table">
-      <h2>Timetable</h2>
+      <!-- Timetable -->
+      <h2>Dates</h2>
       <ul>
         <li><b>Registration open:</b> January 20 - March 31, 2017</li>
         <li><b>Test dataset available:</b> March 15, 2017</li>
         <li><b>Submission open:</b> March 15, 2017</li>
         <li><b>Submission deadline:</b> March 31, 2017</li>
       </ul>
-    </div>
 
-    <!-- Example images -->
-    <div class="container" id="example-images">
+      <!-- Example images -->
       <h2>Example Images</h2>
-      <img src="/image/examples.jpg" class="img-fluid justify-content-center" alt="Example images">
-    </div>
-
-    <!-- Orgamization team -->
-
-    <!-- footer -->
-    <div class="footer-bottom">
-      <div class="container">
-        <div class="row">
-          <div class="copyright">
-            All rights reserved
-          </div>
-        </div>
+      <div id="example-images" class="text-center">
+        <img src="image/examples.jpg" class="img-responsive" alt="Example images">
       </div>
-    </div>
-  </div>
 
-  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-  <!-- Include all compiled plugins (below), or include individual files as needed -->
-  <script src="js/bootstrap.min.js"></script>
-</body>
+      <!-- Orgamization team -->
+      <h2>Organization Team</h2>
+      <ul>
+        <li><b>Baoguang Shi</b> PhD student of the School of Electronic Information and Communications, Huazhong University of Science and Technology, China</li>
+        <li><b>Cong Yao</b> Senior researcher at Megvii Technology Inc., China</li>
+        <li><b>Serge Belongie</b> Professor at Cornell Tech and the Department of Computer Science at Cornell University, United States</li>
+        <li><b>Shijian Lu</b> Head of Visual Attention Lab, Institute for Infocomm Research, A*STAR</li>
+        <li><b>Xiang Bai</b> Professor of the School of Electronic Information and Communications, Huazhong University of Science and Technology</li>
+      </ul>
+
+      <div id="footer"> </div>
+    </div>
+
+  </body>
 </html>
