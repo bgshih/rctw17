@@ -23,9 +23,36 @@
       //   emailjs.send("rctw17", "rctw_register", params);
       //   alert("We have received your information. Thanks for signing up!");
       // };
-      function submit_form() {
-        emailjs.sendForm("rctw17", "rctw_register", "register_form");
-        alert("Thanks for signing up! You will receive a confirmation email soon. Please contact us if you encounter any problems.");
+      function check(data)
+      {
+          if (data.length == 0)
+          {
+            return false;
+          }
+          else
+          {
+            return true;
+          }
+      }
+      
+      function submit_form() 
+      {
+          if_email = check($("#input_email").val());         
+          if_institute = check($("#input_institute").val());
+          if_team_name = check($("#input_team_name").val());
+          if_team_members = check($("#input_team_members").val());
+
+          if ( (if_email&&if_institute&&if_team_name&&if_team_members) == false)
+          {
+              alert("You haven't finished the information form.Please complete it before registration！");
+              return false;
+          }
+          else
+          {
+              emailjs.sendForm("rctw17", "rctw_register", "register_form");
+              alert("Thanks for signing up! You will receive a confirmation email soon. Please contact us if you encounter any problems.");
+              return true;
+          }
       }
     </script>
 
@@ -62,7 +89,7 @@
             <!-- <button type="submit" name="submit_button" >Submit</button> -->
           </form>
           <!-- <a class="btn btn-primary" role="button" id="submit_btn">Submit</a> -->
-          <button type="button" class="btn btn-primary" onclick="submit_form()">Submit</button>
+          <button type="button" class="btn btn-primary" onclick="submit_form()" >Submit</button>
         </div>
       </div>
 
@@ -72,3 +99,4 @@
     </div>
   </body>
 </html>
+
