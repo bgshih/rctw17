@@ -12,31 +12,33 @@ from hanziconv import HanziConv
 import csv
 import glob  
 
-def union(poly_1, poly_2):
-  poly_1 = np.array(poly_1)
-  poly_2 = np.array(poly_2)
-  poly = np.concatenate((poly_1,poly_2))
-  union_area = MultiPoint(poly).convex_hull.area
-  return union_area
+def polygon_from_str(polygon_points):
+  """
+  Create a shapely polygon object from gt or dt line.
+  """
+  #polygon_points = [float(o) for o in line.split(',')[:8]]
+  
+  polygon_points = np.array(polygon_points).reshape(4, 2)
+  polygon = Polygon(polygon_points).convex_hull
+  return polygon
 
-def intersect(poly_1,poly_2):
-  poly_1 = np.array(poly_1)
-  poly_1 = MultiPoint(poly_1).convex_hull
-  poly_2 = np.array(poly_2)
-  poly_2 = MultiPoint(poly_2).convex_hull
-  intersect_area = poly_2.intersection(poly_1).area
-  return intersect_area
 
-# def regex(st):
-#   st = ''.join(st.split(' '))
-#   st = re.sub("\"","",st)
-#   sst = st.decode('utf-8')
-#   reg = re.compile(ur"^[\u4e00-\u9fa5\u0041-\u005a\u0061-\u007a0-9]+")   
-#   if reg.findall(sst.lower()):
-#     new_st = reg.findall(sst.lower())
-#     return new_st
-#   else:
-#     return ''
+def polygon_iou(poly1, poly2):
+  """
+  Intersection over union between two shapely polygons.
+  """
+  if not poly1.intersects(poly2): # this test is fast and can accelerate calculation
+    iou = 0
+  else:
+    try:
+      inter_area = poly1.intersection(poly2).area
+      union_area = poly1.area + poly2.area - inter_area
+      # union_area = poly1.union(poly2).area
+      iou = float(inter_area) / union_area
+    except shapely.geos.TopologicalError:
+      print('shapely.geos.TopologicalError occured, iou set to 0')
+      iou = 0
+  return iou
 
 def regex(st):
   st = ''.join(st.split(' '))
@@ -82,7 +84,8 @@ def recog_eval(gt_dir,recog_dir):
       dt_coor = [float(d) for d in dt[0:8]]    
       ious = []
       for index_gt, gt in enumerate(gts):
-        gt_coor = [float(g) for g in gt[0:8]]      
+        gt_coor = [float(g) for g in gt[0:8]]   
+        '''   
         rectangle_1 = []
         rectangle_2 = []
         for ii in range(0,8,2):
@@ -91,6 +94,10 @@ def recog_eval(gt_dir,recog_dir):
         union_area = union(rectangle_1, rectangle_2) 
         intersect_area = intersect(rectangle_1, rectangle_2)
         iou = intersect_area/union_area
+        '''
+        rectangle_1 = polygon_from_str(gt_coor)
+        rectangle_2 = polygon_from_str(dt_coor)
+        iou = polygon_iou(rectangle_1,rectangle_2)
         ious.append(iou)
       max_iou = max(ious)
       max_index = ious.index(max_iou)
