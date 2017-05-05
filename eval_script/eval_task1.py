@@ -3,6 +3,7 @@ import os
 from os.path import join, exists, basename, splitext
 import re
 import sys
+import shapely
 from shapely.geometry import Polygon
 from shapely.geometry import MultiPoint
 import numpy as np
@@ -10,6 +11,8 @@ import matplotlib.pyplot as plt
 import time
 import glob
 import json
+from tqdm import tqdm
+import pickle
 
 IOU_THRESH = 0.5
 N_TEST = 4229
@@ -21,7 +24,7 @@ def polygon_from_str(line):
   """
   polygon_points = [float(o) for o in line.split(',')[:8]]
   polygon_points = np.array(polygon_points).reshape(4, 2)
-  polygon = Polygon(polygon_points)
+  polygon = Polygon(polygon_points).convex_hull
   return polygon
 
 
@@ -29,13 +32,18 @@ def polygon_iou(poly1, poly2):
   """
   Intersection over union between two shapely polygons.
   """
-  if not poly1.intersects(poly2):
-    return 0
+  if not poly1.intersects(poly2): # this test is fast and can accelerate calculation
+    iou = 0
   else:
-    inter_area = poly1.intersection(poly2).area
-    union_area = poly1.union(poly2).area
-    iou = float(inter_area) / union_area
-    return iou
+    try:
+      inter_area = poly1.intersection(poly2).area
+      union_area = poly1.area + poly2.area - inter_area
+      # union_area = poly1.union(poly2).area
+      iou = float(inter_area) / union_area
+    except shapely.geos.TopologicalError:
+      print('shapely.geos.TopologicalError occured, iou set to 0')
+      iou = 0
+  return iou
 
 
 def det_eval(gt_dir, dt_dir, save_dir):
@@ -46,6 +54,7 @@ def det_eval(gt_dir, dt_dir, save_dir):
     dt_dir: the directory of detection results files
     save_dir: the directory for saving evaluation results
   RETURN
+    nothing returned
   """
   # print 'start testing...'
   # print 'start time:',time.asctime(time.localtime(time.time()))
@@ -72,17 +81,20 @@ def det_eval(gt_dir, dt_dir, save_dir):
   all_dt_scores = []
 
   # for every detection, calculate its match to groundtruth
-  dt_files = glob.glob(join(dt_dir, 'image_*.txt'))
+  dt_files = glob.glob(join(dt_dir, '*.txt'))
   print('Number of DT files: %d' % len(dt_files))
-  for dt_file in dt_files:
+  p = re.compile(r'.*(image_\d+)\.txt')
+  print('Calculating matches')
+  for dt_file in tqdm(dt_files):
     # find corresponding gt file
-    fname = splitext(basename(dt_file))[0]
-    if fname not in all_gt:
+    fname = basename(dt_file)
+    key = p.match(fname).group(1)
+    if key not in all_gt:
       print('Result %s not found in groundtruths! This file will be ignored')
-    continue
+      continue
 
     # calculate matches to groundtruth and append to list
-    gt_polygons = all_gt[fname]
+    gt_polygons = all_gt[key]
     with open(dt_file, 'r') as f:
       dt_lines = f.readlines()
     dt_polygons = [polygon_from_str(o) for o in dt_lines]
@@ -127,21 +139,21 @@ def det_eval(gt_dir, dt_dir, save_dir):
   }
 
   print('=================================================================')
-  print('Maximum f-measure:       %f' % eval_results['fmeasure'])
-  print('Corresponding precision: %f' % eval_results['precision'])
-  print('Corresponding recall:    %f' % eval_results['recall'])
-  print('Corresponding threshold: %f' % eval_results['threshold'])
+  print('Maximum f-measure: %f' % eval_results['fmeasure'])
+  print('  |-- precision:   %f' % eval_results['precision'])
+  print('  |-- recall:      %f' % eval_results['recall'])
+  print('  |-- threshold:   %f' % eval_results['threshold'])
   print('=================================================================')
 
   if not exists(save_dir):
     os.makedirs(save_dir)
-  data_save_path = join(save_dir, 'eval_results_data.json')
-  with open(data_save_path, 'w') as f:
-    json.dump(eval_results, f)
-    print('Evaluation results data written to {}'.format(data_save_path))
+  data_save_path = join(save_dir, 'eval_data.pkl')
+  with open(data_save_path, 'wb') as f:
+    pickle.dump(eval_results, f)
+  print('Evaluation results data written to {}'.format(data_save_path))
 
-  return eval_results
+  return
 
 
 if __name__ == '__main__':
-  det_eval('../gt_txts/', '../data/test_submission/', '../data/test_submission/eval_results')
+  det_eval('../data/gt_txts/', '../data/test_submission/dt_txts', '../data/test_submission/eval_results')
