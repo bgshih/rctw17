@@ -7,6 +7,8 @@ import shapely
 from shapely.geometry import Polygon
 from shapely.geometry import MultiPoint
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import time
 import glob
@@ -56,12 +58,6 @@ def det_eval(gt_dir, dt_dir, save_dir):
   RETURN
     nothing returned
   """
-  # print 'start testing...'
-  # print 'start time:',time.asctime(time.localtime(time.time()))
-  # dt_count = 0
-  # gt_count = 0
-  # hit = 0
-
   # load all groundtruths into a dict of {<image-name>: <list-of-polygons>}
   n_gt = 0
   all_gt = {}
@@ -138,6 +134,7 @@ def det_eval(gt_dir, dt_dir, save_dir):
     'all_recalls': recall
   }
 
+  # evaluation summary
   print('=================================================================')
   print('Maximum f-measure: %f' % eval_results['fmeasure'])
   print('  |-- precision:   %f' % eval_results['precision'])
@@ -145,6 +142,7 @@ def det_eval(gt_dir, dt_dir, save_dir):
   print('  |-- threshold:   %f' % eval_results['threshold'])
   print('=================================================================')
 
+  # save evaluation results
   if not exists(save_dir):
     os.makedirs(save_dir)
   data_save_path = join(save_dir, 'eval_data.pkl')
@@ -152,8 +150,53 @@ def det_eval(gt_dir, dt_dir, save_dir):
     pickle.dump(eval_results, f)
   print('Evaluation results data written to {}'.format(data_save_path))
 
+  # plot precision-recall curve
+  vis_save_path = join(save_dir, 'pr_curve.png')
+  plt.clf()
+  plt.plot(recall, precision)
+  plt.xlim(0, 1)
+  plt.ylim(0, 1)
+  plt.title('Precision-Recall Curve')
+  plt.grid()
+  plt.xlabel('Recall')
+  plt.ylabel('Precision')
+  plt.savefig(vis_save_path, dpi=200)
+  print('Precision-recall curve written to {}'.format(vis_save_path))
+
   return
 
 
+def evaluate_all_submissions(root_dir, gt_dir):
+  """
+  Evaluate all submissions and summarize.
+  ARGS
+    root_dir: root directory of submissions
+  """
+  # all submission directory has a 'dt_txts'
+
+  # pairs of submission identifier and detection directory
+  sub_id_sub_dir_pairs = []
+  def _recursive_find_sub_dirs(curr_dir):
+    for root, subdirs, files in os.walk(curr_dir):
+      for subdir in subdirs:
+        if basename(subdir) == 'dt_txts':
+          identifier = basename(root)
+          sub_id_sub_dir_pairs.append((identifier, join(root, subdir)))
+        else:
+          _recursive_find_sub_dirs(subdir)
+
+  _recursive_find_sub_dirs(root_dir)
+
+  for identifier, sub_dir in sub_id_sub_dir_pairs:
+    print('Found submission %8s in directory %s' % (identifier, sub_dir))
+  n_submissions = len(sub_id_sub_dir_pairs)
+
+  # evaluate all submissions
+  for i, pair in enumerate(sub_id_sub_dir_pairs):
+    identifier, sub_dir = pair
+    print('[%2d/%2d] Start evaluating "%s" at directory %s' % (i+1, n_submissions, identifier, sub_dir))
+    det_eval(gt_dir, sub_dir, join(sub_dir, 'eval_results'))
+
+
 if __name__ == '__main__':
-  det_eval('../data/gt_txts/', '../data/test_submission/dt_txts', '../data/test_submission/eval_results')
+  evaluate_all_submissions('../data/submissions', '../data/gt_txts/')
