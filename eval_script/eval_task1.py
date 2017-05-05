@@ -1,6 +1,6 @@
 from __future__ import division
 import os
-from os.path import join, exists, basename, splitext
+from os.path import join, exists, basename, splitext, dirname
 import re
 import sys
 import shapely
@@ -24,6 +24,9 @@ def polygon_from_str(line):
   """
   Create a shapely polygon object from gt or dt line.
   """
+  # remove possible utf-8 BOM
+  if line.startswith('\xef\xbb\xbf'):
+    line = line[3:]
   polygon_points = [float(o) for o in line.split(',')[:8]]
   polygon_points = np.array(polygon_points).reshape(4, 2)
   polygon = Polygon(polygon_points).convex_hull
@@ -46,6 +49,27 @@ def polygon_iou(poly1, poly2):
       print('shapely.geos.TopologicalError occured, iou set to 0')
       iou = 0
   return iou
+
+
+def average_precision(rec, prec):
+  # source: https://github.com/rbgirshick/py-faster-rcnn/blob/master/lib/datasets/voc_eval.py#L47-L61
+  # correct AP calculation
+  # first append sentinel values at the end
+  mrec = np.concatenate(([0.], rec, [1.]))
+  mpre = np.concatenate(([0.], prec, [0.]))
+
+  # compute the precision envelope
+  for i in range(mpre.size - 1, 0, -1):
+    mpre[i - 1] = np.maximum(mpre[i - 1], mpre[i])
+
+  # to calculate area under PR curve, look for points
+  # where X axis (recall) changes value
+  i = np.where(mrec[1:] != mrec[:-1])[0]
+
+  # and sum (\Delta recall) * prec
+  ap = np.sum((mrec[i + 1] - mrec[i]) * mpre[i + 1])
+
+  return ap
 
 
 def det_eval(gt_dir, dt_dir, save_dir):
@@ -166,37 +190,97 @@ def det_eval(gt_dir, dt_dir, save_dir):
   return
 
 
-def evaluate_all_submissions(root_dir, gt_dir):
+def find_submissions(root_dir, name):
+  """
+  Find pairs of submission identifiers and submission directory.
+  """
+  sub_id_dir_pairs = []
+  def _recursive_find_sub_dirs(curr_dir):
+    for root, subdirs, files in os.walk(curr_dir):
+      for subdir in subdirs:
+        if basename(subdir) == name:
+          identifier = basename(root)
+          sub_id_dir_pairs.append((identifier, root))
+          break
+        else:
+          _recursive_find_sub_dirs(subdir)
+
+  _recursive_find_sub_dirs(root_dir)
+  return sub_id_dir_pairs
+
+
+def evaluate_all_submissions(root_dir, gt_dir, skip_evaluated=False):
   """
   Evaluate all submissions and summarize.
   ARGS
     root_dir: root directory of submissions
   """
   # all submission directory has a 'dt_txts'
+  sub_id_dir_pairs = find_submissions(root_dir, 'dt_txts')
 
-  # pairs of submission identifier and detection directory
-  sub_id_sub_dir_pairs = []
-  def _recursive_find_sub_dirs(curr_dir):
-    for root, subdirs, files in os.walk(curr_dir):
-      for subdir in subdirs:
-        if basename(subdir) == 'dt_txts':
-          identifier = basename(root)
-          sub_id_sub_dir_pairs.append((identifier, join(root, subdir)))
-        else:
-          _recursive_find_sub_dirs(subdir)
-
-  _recursive_find_sub_dirs(root_dir)
-
-  for identifier, sub_dir in sub_id_sub_dir_pairs:
+  for identifier, sub_dir in sub_id_dir_pairs:
     print('Found submission %8s in directory %s' % (identifier, sub_dir))
-  n_submissions = len(sub_id_sub_dir_pairs)
+  n_submissions = len(sub_id_dir_pairs)
 
   # evaluate all submissions
-  for i, pair in enumerate(sub_id_sub_dir_pairs):
+  for i, pair in enumerate(sub_id_dir_pairs):
     identifier, sub_dir = pair
-    print('[%2d/%2d] Start evaluating "%s" at directory %s' % (i+1, n_submissions, identifier, sub_dir))
-    det_eval(gt_dir, sub_dir, join(sub_dir, 'eval_results'))
+    if skip_evaluated and exists(join(sub_dir, 'eval_results', 'eval_data.pkl')):
+      print('Skip %s' % identifier)
+    else:
+      print('[%2d/%2d] Start evaluating "%s" at directory %s' % (i+1, n_submissions, identifier, sub_dir))
+      det_eval(gt_dir, join(sub_dir, 'dt_txts'), join(sub_dir, 'eval_results'))
 
+
+def summarize_evaluation(root_dir):
+  sub_id_dir_pairs = find_submissions(root_dir, 'dt_txts')
+  table_items = {'id': [], 'fmeasure': [], 'precision': [], 'recall': [], 'ap': []}
+
+  for identifier, sub_dir in sub_id_dir_pairs:
+    result_data_path = join(sub_dir, 'eval_results', 'eval_data.pkl')
+    with open(result_data_path, 'rb') as f:
+      eval_results = pickle.load(f)
+    
+    if 'ap' not in eval_results:
+      ap = average_precision(eval_results['all_recalls'], eval_results['all_precisions'])
+      eval_results['ap'] = ap
+
+    table_items['id'].append(identifier)
+    table_items['fmeasure'].append(eval_results['fmeasure'])
+    table_items['precision'].append(eval_results['precision'])
+    table_items['recall'].append(eval_results['recall'])
+    table_items['ap'].append(eval_results['ap'])
+  
+  for k in table_items.keys():
+    table_items[k] = np.array(table_items[k])
+
+  n_submissions = len(table_items['id'])
+
+  def _rank(measure):
+    """
+    Find descending-order rankings (starts from 1) of elements in an array.
+    """
+    sort_idx = np.argsort(-measure)
+    ranks = np.empty(len(measure), int)
+    ranks[sort_idx] = np.arange(1, len(measure)+1)
+    return ranks
+
+
+  fm_rank = _rank(table_items['fmeasure'])
+  ap_rank = _rank(table_items['ap'])
+  
+  title_fmt = '%5s | %8s | %8s | %8s | %8s | %8s | %8s'
+  row_fmt = '%5s | %.6f | %8d | %.6f | %.6f | %.6f | %8d'
+  print(title_fmt % ('ID', 'fmeasure', 'fm-rank', 'prec', 'rec', 'ap', 'ap-rank'))
+  for i in range(n_submissions):
+    print(row_fmt % (table_items['id'][i],
+                     table_items['fmeasure'][i],
+                     fm_rank[i],
+                     table_items['precision'][i],
+                     table_items['recall'][i],
+                     table_items['ap'][i],
+                     ap_rank[i]))
 
 if __name__ == '__main__':
-  evaluate_all_submissions('../data/submissions', '../data/gt_txts/')
+  # evaluate_all_submissions('../data/submissions', '../data/gt_txts/', skip_evaluated=True)
+  summarize_evaluation('../data/submissions')
