@@ -235,22 +235,22 @@ def evaluate_all_submissions(root_dir, gt_dir, skip_evaluated=False):
 def summarize_evaluation(root_dir):
   sub_id_dir_pairs = find_submissions(root_dir, 'dt_txts')
   table_items = {'id': [], 'fmeasure': [], 'precision': [], 'recall': [], 'ap': []}
+  pr_data = []
 
+  # read results data
   for identifier, sub_dir in sub_id_dir_pairs:
     result_data_path = join(sub_dir, 'eval_results', 'eval_data.pkl')
     with open(result_data_path, 'rb') as f:
       eval_results = pickle.load(f)
-    
     if 'ap' not in eval_results:
       ap = average_precision(eval_results['all_recalls'], eval_results['all_precisions'])
       eval_results['ap'] = ap
-
     table_items['id'].append(identifier)
     table_items['fmeasure'].append(eval_results['fmeasure'])
     table_items['precision'].append(eval_results['precision'])
     table_items['recall'].append(eval_results['recall'])
     table_items['ap'].append(eval_results['ap'])
-  
+    pr_data.append((identifier, eval_results['all_precisions'], eval_results['all_recalls']))
   for k in table_items.keys():
     table_items[k] = np.array(table_items[k])
 
@@ -265,10 +265,10 @@ def summarize_evaluation(root_dir):
     ranks[sort_idx] = np.arange(1, len(measure)+1)
     return ranks
 
-
   fm_rank = _rank(table_items['fmeasure'])
   ap_rank = _rank(table_items['ap'])
   
+  # summary table
   title_fmt = '%5s | %8s | %8s | %8s | %8s | %8s | %8s'
   row_fmt = '%5s | %.6f | %8d | %.6f | %.6f | %.6f | %8d'
   print(title_fmt % ('ID', 'fmeasure', 'fm-rank', 'prec', 'rec', 'ap', 'ap-rank'))
@@ -280,6 +280,24 @@ def summarize_evaluation(root_dir):
                      table_items['recall'][i],
                      table_items['ap'][i],
                      ap_rank[i]))
+
+  # summary graph
+  vis_save_path = join(root_dir, 'pr_summary.png')
+  plt.clf()
+  plt.xlim(0, 1)
+  plt.ylim(0, 1)
+  plt.grid()
+  plt.title('Precision-Recall Curve')
+  plt.xlabel('Recall')
+  plt.ylabel('Precision')
+  colors = ['#4c0000', '#331a1a', '#ff9180', '#e6b4ac', '#e53d00', '#a66953', '#59392d', '#ffb380', '#a65800', '#4c2900', '#e6d2ac', '#cca300', '#59502d', '#a3cc00', '#8a994d', '#eaffbf', '#00ff00', '#005900', '#00b330', '#10401d', '#608071', '#00ffaa', '#238c69', '#80ffe5', '#009ba6', '#00ccff', '#263033', '#1d5673', '#3d9df2', '#0016a6', '#99a0cc', '#5353a6', '#110040', '#494359', '#7e39e6', '#5c3366', '#2e1a33', '#bf30b6', '#cc99bb', '#7f0044', '#f20061', '#f279aa', '#a60016', '#7f4048']
+  for i, pr_data_item in enumerate(pr_data):
+    identifier, all_precisions, all_recalls = pr_data_item
+    plt.plot(all_recalls, all_precisions, label=identifier, color=colors[i])
+  plt.legend(prop={'size':6})
+  plt.savefig(vis_save_path, dpi=200)
+  print('PR summary saved to {}'.format(vis_save_path))
+
 
 if __name__ == '__main__':
   # evaluate_all_submissions('../data/submissions', '../data/gt_txts/', skip_evaluated=True)
