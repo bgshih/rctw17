@@ -2,7 +2,8 @@ from __future__ import division
 import os
 import re
 import sys
-from shapely.geometry import MultiPoint, Polygon
+from shapely.geometry import Polygon
+from shapely.geometry import MultiPoint
 import numpy as np
 from difflib import SequenceMatcher
 from collections import defaultdict
@@ -221,8 +222,8 @@ def eval_all(gt_dir,test_path):
   user_dirs = [a.split('/')[-2] for a in recog_dirs]
   print user_dirs
   column = {}
-  if os.path.exists('./recog_record.csv'):
-    with open('./recog_record.csv', 'rb') as f:
+  if os.path.exists('./recog_record_test.csv'):
+    with open('./recog_record_test.csv', 'rb') as f:
       reader = csv.reader(f)
       headers = reader.next()    
       for h in headers:
@@ -243,7 +244,7 @@ def eval_all(gt_dir,test_path):
     column['edit_distance'].append(str(edit_dist))
     print 'column',column
     keys = ['id','edit_distance']
-    with open('./recog_record.csv', 'wb') as csvfile:
+    with open('./recog_record_test.csv', 'wb') as csvfile:
       writer = csv.writer(csvfile)
       writer.writerow(keys)
       writer.writerows(zip(*[column[key] for key in keys]))
